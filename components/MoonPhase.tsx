@@ -1,9 +1,11 @@
 'use client'
 import { useMoonPhase } from '@/hooks/useMoonPhase'
+import { useUserLocation } from '@/hooks/useUserLocation'
 import { motion } from 'framer-motion'
 
 export default function MoonPhase() {
-  const moonData = useMoonPhase()
+  const loc = useUserLocation()
+  const moonData = useMoonPhase(loc.lat, loc.lon)
 
   if (!moonData) {
     return (
@@ -18,7 +20,7 @@ export default function MoonPhase() {
 
   const formatTime = (date: Date | null) => {
     if (!date) return '--:--'
-    return date.toLocaleTimeString('en-IN', { 
+    return date.toLocaleTimeString(undefined, { 
       hour: '2-digit', 
       minute: '2-digit',
       hour12: true 
@@ -26,7 +28,7 @@ export default function MoonPhase() {
   }
 
   const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-IN', { 
+    return date.toLocaleDateString(undefined, { 
       month: 'short', 
       day: 'numeric',
       hour: '2-digit',

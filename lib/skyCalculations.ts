@@ -195,12 +195,12 @@ export function horizontalToCartesian(position: SkyPosition): [number, number, n
 }
 
 /**
- * Get the default observer location (Bangalore, India)
+ * Get the default observer location (0,0)
  */
 export function getDefaultLocation(): ObserverLocation {
   return {
-    latitude: 12.9716,
-    longitude: 77.5946,
+    latitude: 0,
+    longitude: 0,
   };
 }
 

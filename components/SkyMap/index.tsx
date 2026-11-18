@@ -3,6 +3,7 @@
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import { Suspense, useState, useEffect, useMemo } from 'react';
+import { useUserLocation } from '@/hooks/useUserLocation';
 import * as THREE from 'three';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import { StarField } from './StarField';
@@ -12,7 +13,6 @@ import { ConstellationLines } from './ConstellationLines';
 import { CompassLabels } from './CompassLabels';
 import { loadFullStarCatalog, StarRecord } from '@/lib/starCatalog';
 import {
-  BANGALORE_LOCATION,
   equatorialToHorizontal,
   getPlanetPositions,
   getSunPosition,
@@ -31,13 +31,18 @@ interface SkyMapProps {
 }
 
 export function SkyMap({
-  location = BANGALORE_LOCATION,
+  location: locationProp,
   bortleScale = 4,
   showGrid = true,
   showGround = true,
   showPlanets = true,
   className = ''
 }: SkyMapProps) {
+const userLoc = useUserLocation();
+const location = useMemo<ObserverLocation>(
+() => locationProp ?? { latitude: userLoc.lat, longitude: userLoc.lon },
+[locationProp, userLoc.lat, userLoc.lon]
+);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [stars, setStars] = useState<StarRecord[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -218,7 +223,7 @@ export function SkyMap({
         <div className="text-white/80 text-sm space-y-1">
           <div className="flex justify-between">
             <span>Location:</span>
-            <span className="text-[#00F0FF]">Bangalore</span>
+            <span className="text-[#00F0FF]">{location.latitude.toFixed(2)}, {location.longitude.toFixed(2)}</span>
           </div>
           <div className="flex justify-between">
             <span>Sun Alt:</span>

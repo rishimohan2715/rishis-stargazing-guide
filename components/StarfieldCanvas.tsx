@@ -25,7 +25,7 @@ type ConstellationVisibility = {
   lines: typeof constellationLines
 }
 
-const DEFAULT_LOCATION: ObserverLocation = { lat: 40.7128, lon: -74.006 }
+const DEFAULT_LOCATION: ObserverLocation = { lat: 0, lon: 0 }
 
 const useObserverLocation = () => {
   const [location, setLocation] = useState<ObserverLocation>(DEFAULT_LOCATION)

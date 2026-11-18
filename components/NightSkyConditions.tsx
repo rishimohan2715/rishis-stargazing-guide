@@ -22,26 +22,18 @@ const formatSummary = (score: number) => {
   return 'Poor — clouds or bright moon'
 }
 
+import { useUserLocation } from '@/hooks/useUserLocation'
 export default function NightSkyConditions() {
-  const [coords, setCoords] = useState({ lat: 12.9716, lon: 77.5946, label: 'Bangalore' })
+const loc = useUserLocation()
+const [coords, setCoords] = useState({ lat: 0, lon: 0, label: 'Locating...' })
+
+useEffect(() => {
+if (loc.located) setCoords({ lat: loc.lat, lon: loc.lon, label: 'Your location' })
+}, [loc.located, loc.lat, loc.lon])
   const [conditions, setConditions] = useState<SkyConditions | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Try to use browser geolocation for better relevance
-  useEffect(() => {
-    if (!navigator.geolocation) return
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const { latitude, longitude } = pos.coords
-        setCoords({ lat: latitude, lon: longitude, label: 'Your location' })
-      },
-      () => {
-        /* silently fall back to default */
-      },
-      { maximumAge: 10 * 60 * 1000, timeout: 5000 }
-    )
-  }, [])
 
   useEffect(() => {
     const fetchConditions = async () => {

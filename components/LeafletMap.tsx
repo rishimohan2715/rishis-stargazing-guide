@@ -289,6 +289,18 @@ function ISSTracker() {
   )
 }
 
+function LocateMe() {
+const map = useMap()
+useEffect(() => {
+if (!navigator.geolocation) return
+navigator.geolocation.getCurrentPosition(
+(pos) => map.flyTo([pos.coords.latitude, pos.coords.longitude], 6, { duration: 2 }),
+(err) => console.log('LocateMe failed', err.code, err.message)
+)
+}, [map])
+return null
+}
+
 export default function LeafletMap({ selectedLocation }: LeafletMapProps) {
   return (
     <div className="h-full w-full relative">
@@ -354,8 +366,8 @@ export default function LeafletMap({ selectedLocation }: LeafletMapProps) {
       `}} />
       
       <MapContainer
-        center={[20, 78]} // Center on India for better ISS viewing
-        zoom={4}
+        center={[0, 0]}
+        zoom={2}
         minZoom={2} // Allow zooming out to see full Earth
         maxZoom={18}
         style={{ height: '100%', width: '100%' }}
@@ -368,6 +380,7 @@ export default function LeafletMap({ selectedLocation }: LeafletMapProps) {
         maxBoundsViscosity={1.0}
       >
         {/* Using OpenStreetMap standard tiles - Note: Disputed territories shown per OSM community guidelines */}
+        <LocateMe />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | Light pollution data: 2021 Census + Bortle estimates'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

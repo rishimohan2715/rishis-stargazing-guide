@@ -83,7 +83,7 @@ function calculateNextPhase(currentPhase: number, targetPhase: number): Date {
   return nextPhaseDate
 }
 
-export function useMoonPhase(lat: number = 12.9716, lon: number = 77.5946) {
+export function useMoonPhase(lat: number = 0, lon: number = 0) {
   const [moonData, setMoonData] = useState<MoonData | null>(null)
 
   useEffect(() => {

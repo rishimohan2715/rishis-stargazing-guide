@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useUserLocation } from '@/hooks/useUserLocation';
 
 declare global {
   interface Window {
@@ -46,16 +47,6 @@ function StellariumEngine() {
 
             console.log('Stellarium engine loaded successfully');
             
-            // Set observer location (Bangalore) - check if observer exists
-            if (stel.observer) {
-              stel.observer.latitude = 12.9716 * Math.PI / 180;
-              stel.observer.longitude = 77.5946 * Math.PI / 180;
-              stel.observer.elevation = 920;
-            } else if (stel.core && stel.core.observer) {
-              stel.core.observer.latitude = 12.9716 * Math.PI / 180;
-              stel.core.observer.longitude = 77.5946 * Math.PI / 180;
-              stel.core.observer.elevation = 920;
-            }
 
             setEngine(stel);
             setLoading(false);
@@ -102,6 +93,15 @@ function StellariumEngine() {
       }
     };
   }, []);
+const userLoc = useUserLocation();
+useEffect(() => {
+if (!engine || !userLoc.located) return;
+const obs = engine.observer ?? engine.core?.observer;
+if (!obs) return;
+obs.latitude = (userLoc.lat * Math.PI) / 180;
+obs.longitude = (userLoc.lon * Math.PI) / 180;
+obs.elevation = 0;
+}, [engine, userLoc.located, userLoc.lat, userLoc.lon]);
 
   const handleZoom = (delta: number) => {
     if (engine) {

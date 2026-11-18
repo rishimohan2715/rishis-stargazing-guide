@@ -1,37 +1,23 @@
 'use client'
 import { useISSTracker } from '@/hooks/useISSTracker'
+import { useUserLocation } from '@/hooks/useUserLocation'
 import { useEffect, useState } from 'react'
 
 export default function ISSTracker() {
-  const [userLocation, setUserLocation] = useState<{lat: number, lon: number} | null>(null)
-  const [locationName, setLocationName] = useState<string>('Getting location...')
-  
-  // Set default location immediately
-  useEffect(() => {
-    // Default to Bangalore first
-    setUserLocation({ lat: 12.9716, lon: 77.5946 })
-    setLocationName('Bangalore')
-    
-    // Then try to get actual user location
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          setUserLocation({
-            lat: pos.coords.latitude,
-            lon: pos.coords.longitude
-          })
-          // Reverse geocode to get location name
-          fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${pos.coords.latitude}&lon=${pos.coords.longitude}`)
-            .then(res => res.json())
-            .then(data => {
-              const city = data.address?.city || data.address?.town || data.address?.state || 'Your Location'
-              setLocationName(city)
-            })
-            .catch(() => setLocationName('Your Location'))
-        }
-      )
-    }
-  }, [])
+const loc = useUserLocation()
+const userLocation = loc.located ? { lat: loc.lat, lon: loc.lon } : null
+const [locationName, setLocationName] = useState<string>('Locating...')
+
+useEffect(() => {
+if (!loc.located) return
+fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${loc.lat}&lon=${loc.lon}`)
+.then((res) => res.json())
+.then((data) => {
+const city = data.address?.city || data.address?.town || data.address?.state || 'Your Location'
+setLocationName(city)
+})
+.catch(() => setLocationName('Your Location'))
+}, [loc.located, loc.lat, loc.lon])
   
   const { position, nextPass, isLoading, passesLoading, passesError } = useISSTracker(
     userLocation?.lat,
@@ -40,7 +26,7 @@ export default function ISSTracker() {
 
   const formatTime = (timestamp: number) => {
     const date = new Date(timestamp * 1000)
-    return date.toLocaleString('en-IN', { 
+    return date.toLocaleString(undefined, { 
       month: 'short',
       day: 'numeric',
       hour: '2-digit', 
